@@ -84,7 +84,8 @@ else
 fi
 
 # ── Step 5: Write Claude Desktop config snippet ───────────
-cat > quip_mcp_config.json << EOF
+TEMP_CONFIG=$(mktemp /tmp/quip_mcp_config.XXXXXX.json)
+cat > "$TEMP_CONFIG" << EOF
 {
   "mcpServers": {
     "quip": {
@@ -104,7 +105,7 @@ cat > quip_mcp_config.json << EOF
 }
 EOF
 
-log "Config snippet saved → quip_mcp_config.json"
+log "Config snippet saved → $TEMP_CONFIG"
 
 # ── Step 6: Apply Claude Desktop config ───────────────────
 echo ""
@@ -113,11 +114,11 @@ CLAUDE_CONFIG="$HOME/Library/Application Support/Claude/claude_desktop_config.js
 if [ -f "$CLAUDE_CONFIG" ]; then
   warn "Claude Desktop config already exists at:"
   warn "  $CLAUDE_CONFIG"
-  warn "Please manually merge the snippet from quip_mcp_config.json"
+  warn "Please manually merge the snippet from $TEMP_CONFIG"
   warn "into that file under the \"mcpServers\" key."
 else
   mkdir -p "$HOME/Library/Application Support/Claude"
-  cp quip_mcp_config.json "$CLAUDE_CONFIG"
+  cp "$TEMP_CONFIG" "$CLAUDE_CONFIG"
   log "Claude Desktop config written automatically!"
 fi
 
