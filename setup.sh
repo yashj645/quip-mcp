@@ -40,6 +40,21 @@ if ! command -v npx &>/dev/null; then
 fi
 log "npx found"
 
+# ── Check Claude Desktop ──────────────────────────────────
+if [ ! -d "/Applications/Claude.app" ]; then
+  warn "Claude Desktop not found on this machine."
+  warn "Download it from: https://claude.ai/download"
+  warn "You can finish this setup now and install Claude Desktop later."
+  echo ""
+  read -rp "Continue setup anyway? (y/n): " CONTINUE
+  if [[ "$CONTINUE" != "y" && "$CONTINUE" != "Y" ]]; then
+    echo "Setup cancelled. Install Claude Desktop first, then re-run this script."
+    exit 0
+  fi
+else
+  log "Claude Desktop found"
+fi
+
 # ── Step 2: Get Quip token ────────────────────────────────
 echo ""
 warn "You'll need your Quip API token."

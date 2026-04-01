@@ -34,6 +34,22 @@ if (-not (Get-Command npx -ErrorAction SilentlyContinue)) {
 }
 Log "npx found"
 
+# ── Check Claude Desktop ──────────────────────────────────
+$CLAUDE_EXE = "$env:LOCALAPPDATA\AnthropicClaude\claude.exe"
+if (-not (Test-Path $CLAUDE_EXE)) {
+  Warn "Claude Desktop not found on this machine."
+  Warn "Download it from: https://claude.ai/download"
+  Warn "You can finish this setup now and install Claude Desktop later."
+  Write-Host ""
+  $CONTINUE = Read-Host "Continue setup anyway? (y/n)"
+  if ($CONTINUE -ne "y" -and $CONTINUE -ne "Y") {
+    Write-Host "Setup cancelled. Install Claude Desktop first, then re-run this script."
+    exit 0
+  }
+} else {
+  Log "Claude Desktop found"
+}
+
 # ── Step 2: Get Quip token ────────────────────────────────
 Write-Host ""
 Warn "You'll need your Quip API token."
