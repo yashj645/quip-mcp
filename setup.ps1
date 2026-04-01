@@ -118,6 +118,38 @@ if (Test-Path $CLAUDE_CONFIG) {
   Log "Claude Desktop config written automatically!"
 }
 
+# ── Step 7: Apply Claude Code config ──────────────────────
+Write-Host ""
+$CLAUDE_CODE_CONFIG = "$env:USERPROFILE\.claude.json"
+$CLAUDE_CODE_CMD = Get-Command claude -ErrorAction SilentlyContinue
+
+if ($CLAUDE_CODE_CMD -or (Test-Path $CLAUDE_CODE_CONFIG)) {
+  Log "Claude Code detected — updating $CLAUDE_CODE_CONFIG..."
+
+  $quipEntry = @{
+    type    = "stdio"
+    command = "npx"
+    args    = @("-y", "@yashj645/quip-mcp-server", "--storage-path", $STORAGE_PATH, "--file-protocol")
+    env     = @{ QUIP_TOKEN = $QUIP_TOKEN }
+  }
+
+  $config = @{}
+  if (Test-Path $CLAUDE_CODE_CONFIG) {
+    $config = Get-Content $CLAUDE_CODE_CONFIG -Raw | ConvertFrom-Json -AsHashtable
+  }
+
+  if (-not $config.ContainsKey("mcpServers")) {
+    $config["mcpServers"] = @{}
+  }
+  $config["mcpServers"]["quip"] = $quipEntry
+
+  $config | ConvertTo-Json -Depth 10 | Out-File -FilePath $CLAUDE_CODE_CONFIG -Encoding UTF8
+  Log "Claude Code config updated!"
+} else {
+  Warn "Claude Code not found — skipping Claude Code config."
+  Warn "If you install Claude Code later, run this script again."
+}
+
 # ── Done ──────────────────────────────────────────────────
 Write-Host ""
 Write-Host "=================================================="

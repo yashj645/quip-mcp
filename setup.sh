@@ -121,6 +121,34 @@ else
   log "Claude Desktop config written automatically!"
 fi
 
+# ── Step 7: Apply Claude Code config ──────────────────────
+echo ""
+CLAUDE_CODE_CONFIG="$HOME/.claude.json"
+
+if command -v claude &>/dev/null || [ -f "$CLAUDE_CODE_CONFIG" ]; then
+  log "Claude Code detected — updating $CLAUDE_CODE_CONFIG..."
+
+  QUIP_ENTRY="{\"type\":\"stdio\",\"command\":\"npx\",\"args\":[\"-y\",\"@yashj645/quip-mcp-server\",\"--storage-path\",\"${STORAGE_PATH}\",\"--file-protocol\"],\"env\":{\"QUIP_TOKEN\":\"${QUIP_TOKEN}\"}}"
+
+  python3 -c "
+import json, os, sys
+config_path = os.path.expanduser('~/.claude.json')
+entry = json.loads(sys.argv[1])
+config = {}
+if os.path.exists(config_path):
+    with open(config_path) as f:
+        config = json.load(f)
+config.setdefault('mcpServers', {})['quip'] = entry
+with open(config_path, 'w') as f:
+    json.dump(config, f, indent=2)
+" "$QUIP_ENTRY"
+
+  log "Claude Code config updated!"
+else
+  warn "Claude Code not found — skipping Claude Code config."
+  warn "If you install Claude Code later, run this script again."
+fi
+
 # ── Done ──────────────────────────────────────────────────
 echo ""
 echo "=================================================="
