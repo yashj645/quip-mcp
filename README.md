@@ -11,7 +11,7 @@ Connect your Quip workspace to Claude Desktop — lets Claude read your Quip doc
 Open Terminal and run:
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/yashj645/quip-mcp/main/setup.sh | bash
+bash <(curl -fsSL https://raw.githubusercontent.com/yashj645/quip-mcp/main/setup.sh)
 ```
 
 ### Windows
