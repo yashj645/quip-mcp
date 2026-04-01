@@ -45,7 +45,7 @@ echo ""
 warn "You'll need your Quip API token."
 warn "Get it from: https://gofynd.quip.com/dev/token"
 echo ""
-read -rp "Paste your Quip API token here: " QUIP_TOKEN
+read -rp "Paste your Quip API token here: " QUIP_TOKEN </dev/tty
 
 if [ -z "$QUIP_TOKEN" ]; then
   error "Token cannot be empty."
