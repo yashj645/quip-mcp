@@ -1,146 +1,76 @@
-# Quip MCP Server Setup
+# Quip MCP
 
-Connect your Quip workspace (`gofynd.quip.com`) to Claude Desktop via MCP.
+Connect your Quip workspace to Claude Desktop — lets Claude read your Quip documents and spreadsheets directly.
 
 ---
 
-## Quick Start
+## Setup
 
-### 1. Create the folder & download setup files
+### Mac / Linux
 
-```bash
-mkdir -p ~/Documents/quip-mcp
-cd ~/Documents/quip-mcp
-```
-
-Copy `setup.sh` and `README.md` into this folder, then run:
+Open Terminal and run:
 
 ```bash
-chmod +x setup.sh
-./setup.sh
+curl -fsSL https://raw.githubusercontent.com/yashj645/quip-mcp/main/setup.sh | bash
 ```
+
+### Windows
+
+Open PowerShell and run:
+
+```powershell
+irm https://raw.githubusercontent.com/yashj645/quip-mcp/main/setup.ps1 | iex
+```
+
+---
 
 The script will:
-- Ask for your Quip API token
-- Clone the TypeScript MCP server from GitHub
-- Install dependencies & build the project
-- Create a `.env` config file
-- Generate and apply the Claude Desktop config
-- Run a smoke test to verify everything works
+1. Ask for your Quip API token
+2. Create a local storage folder
+3. Auto-configure Claude Desktop
+
+**Get your Quip token from:** https://gofynd.quip.com/dev/token
 
 ---
 
-## Get Your Quip Token
+## After Setup
 
-1. Open: **https://gofynd.quip.com/dev/token**
-2. Click **"Get Personal Access Token"**
-3. Copy the token — paste it when `setup.sh` asks
-
----
-
-## Manual Steps (if you prefer not to use the script)
-
-### Clone & build
-
-```bash
-cd ~/Documents/quip-mcp
-git clone https://github.com/zxkane/quip-mcp-server-typescript.git .
-npm install
-npm run build
-mkdir -p storage
-```
-
-### Create `.env`
-
-```env
-QUIP_TOKEN=your_token_here
-QUIP_BASE_URL=https://platform.quip.com
-QUIP_STORAGE_PATH=/Users/YOUR_USERNAME/Documents/quip-mcp/storage
-```
-
-### Configure Claude Desktop
-
-Edit `~/Library/Application Support/Claude/claude_desktop_config.json`:
-
-```json
-{
-  "mcpServers": {
-    "quip": {
-      "command": "node",
-      "args": [
-        "/Users/YOUR_USERNAME/Documents/quip-mcp/dist/index.js",
-        "--storage-path",
-        "/Users/YOUR_USERNAME/Documents/quip-mcp/storage",
-        "--file-protocol"
-      ],
-      "env": {
-        "QUIP_TOKEN": "your_token_here"
-      }
-    }
-  }
-}
-```
-
-> Replace `YOUR_USERNAME` with the output of `whoami`
-
----
-
-## Using the MCP Server in Claude
-
-The main tool is `quip_read_spreadsheet`. Find the **Thread ID** from your Quip URL:
-
-```
-https://gofynd.quip.com/AbCdEfGhIjKl
-                         ^^^^^^^^^^^^
-                         This is the Thread ID
-```
+1. Quit Claude Desktop completely
+2. Reopen it
+3. Look for `quip` in the MCP tools list
 
 Then ask Claude:
+- *"Read the Quip document with thread ID `<ID>`"*
+- *"Read the Quip spreadsheet with thread ID `<ID>`"*
 
-- *"Read the Quip spreadsheet with thread ID AbCdEfGhIjKl"*
-- *"Read the 'Budget' sheet from Quip thread AbCdEfGhIjKl"*
+**Finding the Thread ID:** It's the part of the URL right after `gofynd.quip.com/`  
+Example: `https://gofynd.quip.com/S6eaArZiT0xy/Doc-Title` → ID is `S6eaArZiT0xy`
 
 ---
 
-## Project Structure (after setup)
+## Requirements
 
-```
-~/Documents/quip-mcp/
-├── setup.sh                         ← Run this first
-├── README.md                        ← This file
-├── .env                             ← Your credentials (auto-created)
-├── storage/                         ← Downloaded CSV files go here
-├── dist/                            ← Compiled server (auto-built)
-│   └── index.js                     ← Main server entry point
-├── src/                             ← TypeScript source
-├── package.json
-└── claude_desktop_config_snippet.json  ← Claude config (auto-created)
-```
+| | Mac | Windows |
+|---|---|---|
+| Node.js v18+ | [nodejs.org](https://nodejs.org) | [nodejs.org](https://nodejs.org) |
+| Claude Desktop | Required | Required |
+| Shell | Terminal (built-in) | PowerShell (built-in) |
 
 ---
 
 ## Troubleshooting
 
 | Problem | Fix |
-|--------|-----|
+|---|---|
 | `node: command not found` | Install Node.js 18+ from nodejs.org |
-| `git: command not found` | Run `xcode-select --install` |
 | MCP not showing in Claude | Fully quit & reopen Claude Desktop |
-| Token error from Quip | Re-generate token at gofynd.quip.com/dev/token |
-| Build fails | Run `npm install` then `npm run build` again |
+| Token error | Re-generate token at gofynd.quip.com/dev/token |
+| Config already exists warning | Manually merge `quip_mcp_config.json` into your existing Claude config |
 
 ---
 
-## Verify Setup
+## Source
 
-```bash
-cd ~/Documents/quip-mcp
-
-# Test with mock data (no real token needed)
-node dist/index.js --mock --storage-path ./storage
-
-# Test with your real token
-node dist/index.js --storage-path ./storage
-```
-
-Press `Ctrl+C` to stop. No errors = you're good to go!
+- Setup scripts: https://github.com/yashj645/quip-mcp
+- MCP server package: https://www.npmjs.com/package/@yashj645/quip-mcp-server
+- Server source code: https://github.com/yashj645/quip-mcp-server
